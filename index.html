@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tỷ lệ hoàn thành KPI — Trung tâm 4</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  :root{
+    --bg: #eef1f6;
+    --card: #ffffff;
+    --navy: #1e3a8a;
+    --navy-deep: #14245c;
+    --ink: #1c2430;
+    --ink-soft: #6b7385;
+    --line: #e6e9f0;
+    --green: #2f9e5b;
+    --amber: #d99a1f;
+    --red: #d0453a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page{ max-width: 1080px; margin:0 auto; padding: 28px 28px 40px; }
+
+  .topbar{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap: 16px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .title-wrap{
+    display:flex;
+    align-items:baseline;
+    flex-wrap:wrap;
+    gap: 10px;
+    min-width: 0;
+  }
+  h1{
+    margin: 0;
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: var(--navy-deep);
+    line-height: 1.2;
+  }
+  .title-sub{
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    line-height: 1.3;
+    white-space: nowrap;
+  }
+
+  .topbar-right{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  /* date filter */
+  .date-select-wrap{
+    position:relative;
+    display:inline-flex;
+    align-items:center;
+  }
+  .date-select-wrap svg.cal-icon{
+    position:absolute; left:11px; width:14px; height:14px; color: var(--navy); pointer-events:none;
+  }
+  select#dateFilter{
+    appearance:none;
+    -webkit-appearance:none;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 9px 32px 9px 32px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor:pointer;
+    font-family: 'Inter', sans-serif;
+  }
+  .date-select-wrap svg.chevron{
+    position:absolute; right:10px; width:12px; height:12px; color: var(--ink-soft); pointer-events:none;
+  }
+
+  .dl-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    background: var(--navy);
+    color:#fff;
+    border:none;
+    border-radius: 8px;
+    padding: 9px 15px;
+    font-size: 12.5px;
+    font-weight:700;
+    cursor:pointer;
+    white-space: nowrap;
+  }
+  .dl-btn svg{ width:13px; height:13px; }
+  .dl-btn:hover{ background: var(--navy-deep); }
+
+  .nav-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    background: #fff;
+    color: var(--navy);
+    border: 1px solid var(--navy);
+    border-radius: 8px;
+    padding: 9px 15px;
+    font-size: 12.5px;
+    font-weight:700;
+    cursor:pointer;
+    white-space: nowrap;
+    text-decoration:none;
+  }
+  .nav-btn svg{ width:13px; height:13px; }
+  .nav-btn:hover{ background: #eaeff9; }
+
+  /* toggle */
+  .toggle-group{ display:flex; background:#e3e7f0; border-radius:9px; padding:3px; gap:3px; flex:none; }
+  .toggle-btn{
+    border:none; background:transparent; padding: 8px 18px; border-radius:7px;
+    font-size:12.5px; font-weight:700; color: var(--ink-soft); cursor:pointer;
+    transition: background .15s, color .15s;
+  }
+  .toggle-btn.active{ background:#fff; color: var(--navy); box-shadow: 0 1px 3px rgba(20,36,92,0.12); }
+
+  .card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px 24px 24px;
+    box-shadow: 0 1px 3px rgba(20,36,92,0.05);
+  }
+
+  /* ---------- group header ---------- */
+  .persp-block{ margin-bottom: 26px; }
+  .persp-block:last-child{ margin-bottom: 0; }
+
+  .persp-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: #eaeff9;
+    border: 1px solid #d7e0f2;
+    color: var(--navy-deep);
+    margin-bottom: 14px;
+  }
+  .persp-head .ph-name{ font-size: 13px; font-weight: 700; }
+
+  /* bars */
+  .bar-row{
+    display:grid;
+    grid-template-columns: 30px 200px 1fr 160px;
+    align-items:center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .bar-row:last-child{ margin-bottom: 0; }
+  .bar-num{
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-align:center;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+  .bar-label{
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height:1.3;
+  }
+  .bar-track{
+    position:relative;
+    height: 20px;
+    background: #f1f3f8;
+    border-radius: 5px;
+    overflow: visible;
+  }
+  .bar-fill{
+    position:absolute;
+    left:0; top:0; bottom:0;
+    border-radius: 5px;
+    width: 0%;
+    transition: width .7s cubic-bezier(.16,.8,.3,1);
+  }
+  .bar-fill.good{ background: var(--green); }
+  .bar-fill.warn{ background: var(--amber); }
+  .bar-fill.bad{ background: var(--red); }
+  .bar-detail{
+    text-align:right;
+    line-height:1.3;
+  }
+  .bar-detail .pct{
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+  .bar-detail .pct.good{ color: var(--green); }
+  .bar-detail .pct.warn{ color: var(--amber); }
+  .bar-detail .pct.bad{ color: var(--red); }
+
+  .kpi-scale{
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+  .kpi-scale-title{
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--navy-deep);
+    margin-bottom: 10px;
+  }
+  .kpi-scale-table{
+    width: 100%;
+    max-width: 520px;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .kpi-scale-table th{
+    text-align: left;
+    padding: 7px 10px;
+    background: #eaeff9;
+    color: var(--navy-deep);
+    font-weight: 700;
+    border: 1px solid var(--line);
+  }
+  .kpi-scale-table td{
+    padding: 7px 10px;
+    border: 1px solid var(--line);
+    color: var(--ink);
+  }
+
+  .total-score-box{
+    display:flex;
+    align-items:baseline;
+    gap: 12px;
+    margin-top: 22px;
+    padding: 12px 16px;
+    background: #eaeff9;
+    border: 1px solid #d7e0f2;
+    border-radius: 10px;
+    flex-wrap: wrap;
+  }
+  .total-score-label{
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--navy-deep);
+  }
+  .total-score-value{
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--navy-deep);
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+  }
+  .total-score-level{
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--navy-deep);
+  }
+
+  .footline{
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    margin-top: 14px;
+    text-align: right;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="topbar">
+    <div class="title-wrap">
+      <h1>Tỷ lệ hoàn thành KPI</h1>
+      <div class="title-sub">Trung tâm 4 · Kỳ theo dõi: Tháng 09/2026</div>
+    </div>
+    <div class="topbar-right">
+      <div class="date-select-wrap">
+        <svg class="cal-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <select id="dateFilter"></select>
+        <svg class="chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <button class="dl-btn" id="downloadBtn">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+        Tải dữ liệu (.xlsx)
+      </button>
+      <div class="toggle-group">
+        <button class="toggle-btn active" data-mode="ratio">Tỷ lệ</button>
+        <button class="toggle-btn" data-mode="value">Giá trị</button>
+      </div>
+      <a class="nav-btn" href="spcncl_dashboard/index.html">
+        Tiến độ SPCNCL, SP Bộ giao
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+      </a>
+      <a class="nav-btn" href="admin/index.html" title="Trang quản trị dữ liệu">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 008.6 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H2.5a2 2 0 010-4h.09A1.65 1.65 0 004.6 8.6a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V2.5a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21.5a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Quản trị
+      </a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div id="groupsContainer"></div>
+
+    <div class="total-score-box">
+      <span class="total-score-label">Tổng điểm KPI</span>
+      <span class="total-score-level" id="totalScoreLevel">—</span>
+      <span class="total-score-value" id="totalScoreValue">—</span>
+    </div>
+
+    <div class="kpi-scale">
+      <div class="kpi-scale-title">Thang xếp loại điểm tổng hợp KPI</div>
+      <table class="kpi-scale-table">
+        <thead>
+          <tr><th>Điểm tổng hợp KPI</th><th>Xếp loại</th><th>Mức độ hoàn thành</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>105 ≤ Điểm KPI</td><td>A+</td><td>Xuất sắc</td></tr>
+          <tr><td>101 ≤ Điểm KPI &lt; 105</td><td>A</td><td>Vượt</td></tr>
+          <tr><td>100 ≤ Điểm KPI &lt; 101</td><td>B</td><td>Đạt</td></tr>
+          <tr><td>95 ≤ Điểm KPI &lt; 100</td><td>C</td><td>Đạt một phần</td></tr>
+          <tr><td>Điểm KPI &lt; 95</td><td>D</td><td>Không đạt</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footline" id="footline">Nguồn dữ liệu: Bộ chỉ số KPI cấp 3 TCT giao Trung tâm</div>
+
+</div>
+
+<script>
+// ---------------------------------------------------------------
+// KPI_RECORDS được nạp từ API /api/kpi (MongoDB), không còn dùng data.js
+// ---------------------------------------------------------------
+
+let KPI_RECORDS = [];
+let currentMode = 'ratio';
+let currentRecord = null;
+
+function formatDateVN(isoDate){
+  const [y, m, d] = isoDate.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function ratioClass(ratio){
+  if (ratio >= 90) return 'good';
+  if (ratio >= 70) return 'warn';
+  return 'bad';
+}
+
+// Định dạng số kiểu VN: 11533 -> "11.533"
+function formatNumberVN(n){
+  return Number(n).toLocaleString('vi-VN');
+}
+
+/**
+ * computeItemData(item)
+ * ---------------------------------------------------------------
+ * Tính ratio (%) và chuỗi hiển thị (valueText) cuối cùng cho 1 KPI,
+ * dựa theo quy tắc:
+ *
+ *   1) Nếu có "valueNumber" hợp lệ (actual, target là số, target > 0):
+ *        - ratio = round(actual / target * 100)  (TỰ ĐỘNG)
+ *        - text  = "actual / target unit"          (TỰ ĐỘNG)
+ *        (bỏ qua ratio/valueText nếu có khai báo thêm)
+ *
+ *   2) Ngược lại, dùng "valueText" làm chuỗi hiển thị, và ratio lấy theo
+ *      thứ tự ưu tiên:
+ *        a. item.ratio nếu có khai báo               → dùng số đó
+ *        b. không khai báo, nhưng valueText có chứa
+ *           số % (vd: "53%", "Đạt 53,5%")             → tự đọc ra ratio
+ *        c. không có cả hai                            → mặc định ratio = 100
+ * ---------------------------------------------------------------
+ */
+function computeItemData(item){
+  const vn = item.valueNumber;
+  const hasValidNumber = vn && typeof vn.actual === 'number' && typeof vn.target === 'number' && vn.target > 0;
+
+  if (hasValidNumber){
+    const ratio = Math.round((vn.actual / vn.target) * 100);
+    const unit = vn.unit ? ` ${vn.unit}` : '';
+    const text = `${formatNumberVN(vn.actual)} / ${formatNumberVN(vn.target)}${unit}`;
+    return { ratio, text };
+  }
+
+  const text = item.valueText || '';
+
+  let ratio;
+  if (typeof item.ratio === 'number') {
+    // Ưu tiên 1: có khai báo ratio riêng
+    ratio = item.ratio;
+  } else {
+    // Ưu tiên 2: tự đọc số % ngay trong valueText, vd: "53%" hoặc "Đạt 53,5%"
+    const match = text.match(/(-?\d+(?:[.,]\d+)?)\s*%/);
+    ratio = match ? parseFloat(match[1].replace(',', '.')) : 100; // Ưu tiên 3: mặc định 100
+  }
+
+  return { ratio, text };
+}
+
+// Xếp loại mức độ hoàn thành theo Tổng điểm KPI (không hiển thị chữ A+/A/B/C/D)
+function classifyTotalScore(score){
+  if (score >= 105) return 'Xuất sắc';
+  if (score >= 101) return 'Vượt';
+  if (score >= 100) return 'Đạt';
+  if (score >= 95) return 'Đạt một phần';
+  return 'Không đạt';
+}
+
+// Định dạng điểm kiểu VN: 95.01 -> "95,01"
+function formatScoreVN(n){
+  return n.toFixed(2).replace('.', ',');
+}
+
+function populateDateFilter(){
+  const select = document.getElementById('dateFilter');
+  // Sắp xếp giảm dần theo ngày (mới nhất lên đầu)
+  const sorted = [...KPI_RECORDS].sort((a, b) => b.updateDate.localeCompare(a.updateDate));
+  sorted.forEach((rec, i) => {
+    const opt = document.createElement('option');
+    opt.value = rec.updateDate;
+    opt.textContent = `${formatDateVN(rec.updateDate)}`;
+    select.appendChild(opt);
+  });
+  select.value = sorted[0].updateDate;
+  select.addEventListener('change', () => {
+    renderRecord(select.value);
+  });
+}
+
+function getRecordByDate(dateStr){
+  return KPI_RECORDS.find(r => r.updateDate === dateStr);
+}
+
+function renderRecord(dateStr){
+  const record = getRecordByDate(dateStr);
+  if (!record) return;
+  currentRecord = record;
+
+  const container = document.getElementById('groupsContainer');
+  container.innerHTML = '';
+
+  record.groups.forEach(group => {
+    const block = document.createElement('div');
+    block.className = 'persp-block';
+
+    const head = document.createElement('div');
+    head.className = 'persp-head';
+    head.innerHTML = `<span class="ph-name">${group.code}. ${group.name}</span>`;
+    block.appendChild(head);
+
+    group.items.forEach(item => {
+      const { ratio, text } = computeItemData(item);
+      const cls = ratioClass(ratio);
+      const row = document.createElement('div');
+      row.className = 'bar-row';
+      row.innerHTML = `
+        <div class="bar-num">${item.id}</div>
+        <div class="bar-label">${item.name}</div>
+        <div class="bar-track">
+          <div class="bar-fill ${cls}" data-ratio="${ratio}"></div>
+        </div>
+        <div class="bar-detail">
+          <div class="pct ${cls}" data-ratio-text="${ratio}%" data-value-text="${text}">${ratio}%</div>
+        </div>
+      `;
+      block.appendChild(row);
+    });
+
+    container.appendChild(block);
+  });
+
+  const totalScore = typeof record.totalScore === 'number' ? record.totalScore : null;
+  document.getElementById('totalScoreValue').textContent = totalScore !== null ? `${formatScoreVN(totalScore)}%` : '—';
+  document.getElementById('totalScoreLevel').textContent = totalScore !== null ? classifyTotalScore(totalScore) : '—';
+
+  document.getElementById('footline').textContent =
+    `Nguồn dữ liệu: Bộ chỉ số KPI cấp 3 TCT giao Trung tâm · Cập nhật: ${formatDateVN(record.updateDate)}`;
+
+  applyMode(currentMode, false);
+  animateBars();
+}
+
+function animateBars(){
+  const bars = document.querySelectorAll('.bar-row .bar-fill');
+  bars.forEach((bar, i) => {
+    bar.style.width = '0%';
+    setTimeout(() => { bar.style.width = bar.getAttribute('data-ratio') + '%'; }, 60 + i * 55);
+  });
+}
+
+function applyMode(mode, animate){
+  currentMode = mode;
+  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+
+  document.querySelectorAll('.bar-detail .pct').forEach(el => {
+    el.textContent = mode === 'ratio' ? el.getAttribute('data-ratio-text') : el.getAttribute('data-value-text');
+  });
+
+  if (animate) animateBars();
+}
+
+document.querySelectorAll('.toggle-btn').forEach(btn => {
+  btn.addEventListener('click', () => applyMode(btn.dataset.mode, false));
+});
+
+// ---------------------------------------------------------------
+// Xuất Excel (.xlsx) cho ngày đang xem
+// ---------------------------------------------------------------
+document.getElementById('downloadBtn').addEventListener('click', () => {
+  if (!currentRecord) return;
+
+  // Ưu tiên 1: nếu record có khai báo excelFile => tải thẳng file có sẵn trong thư mục excel/
+  if (currentRecord.excelFile) {
+    const a = document.createElement('a');
+    a.href = currentRecord.excelFile;
+    a.download = currentRecord.excelFile.split('/').pop();
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    return;
+  }
+
+  // Ưu tiên 2 (dự phòng): không có excelFile => tự tạo file Excel từ dữ liệu
+  const rows = [];
+  rows.push(['Mã KPI', 'Viễn cảnh chiến lược', 'KPI Đánh giá kết quả hoạt động của Đơn vị', '% hoàn thành', 'Kết quả / Chỉ tiêu', 'Ngày cập nhật']);
+
+  currentRecord.groups.forEach(group => {
+    group.items.forEach(item => {
+      const { ratio, text } = computeItemData(item);
+      rows.push([
+        item.id,
+        `${group.code}. ${group.name}`,
+        item.name,
+        ratio / 100,
+        text,
+        formatDateVN(currentRecord.updateDate)
+      ]);
+    });
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [
+    { wch: 8 },
+    { wch: 26 },
+    { wch: 42 },
+    { wch: 14 },
+    { wch: 26 },
+    { wch: 16 }
+  ];
+  // Format cột % hoàn thành (cột D, từ dòng 2 trở đi) dạng phần trăm
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for (let r = 1; r <= range.e.r; r++) {
+    const cellRef = XLSX.utils.encode_cell({ r, c: 3 });
+    if (ws[cellRef]) ws[cellRef].z = '0%';
+  }
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'KPI');
+
+  const fileName = `KPI_TrungTam4_${currentRecord.updateDate}.xlsx`;
+  XLSX.writeFile(wb, fileName);
+});
+
+// ---------------------------------------------------------------
+// Khởi tạo — nạp dữ liệu từ MongoDB qua API rồi mới render
+// ---------------------------------------------------------------
+async function loadData(){
+  const container = document.getElementById('groupsContainer');
+  try {
+    const res = await fetch('/api/kpi');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    KPI_RECORDS = await res.json();
+  } catch (err) {
+    console.error('Không tải được dữ liệu KPI:', err);
+    if (container) container.innerHTML = '<p style="padding:20px;color:#b42318">Không tải được dữ liệu từ máy chủ. Vui lòng thử lại sau.</p>';
+    return;
+  }
+  if (!KPI_RECORDS.length) {
+    if (container) container.innerHTML = '<p style="padding:20px;color:#6b7385">Chưa có dữ liệu. Vui lòng cập nhật trong trang quản trị (/admin/).</p>';
+    return;
+  }
+  populateDateFilter();
+  renderRecord(document.getElementById('dateFilter').value);
+}
+loadData();
+</script>
+</body>
+</html>

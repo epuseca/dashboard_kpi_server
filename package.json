@@ -1,0 +1,15 @@
+{
+  "name": "dashboard-trungtam4",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dashboard KPI & SPCNCL Trung tâm 4 — dữ liệu lưu trên MongoDB, deploy trên Vercel",
+  "scripts": {
+    "seed": "node scripts/seed.js"
+  },
+  "dependencies": {
+    "mongodb": "^6.10.0"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.5"
+  }
+}
