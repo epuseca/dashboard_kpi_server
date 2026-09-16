@@ -151,8 +151,9 @@
             <input type="date" id="spcnclDate">
           </div>
           <div>
-            <label>Tên file Excel (đặt sẵn trong thư mục /excel)</label>
-            <input type="text" id="spcnclExcelFile" placeholder="excel/SPCNCL_TrungTam4_2026-09-11.xlsx">
+            <label>Tên file Excel (đặt sẵn trong thư mục /excel ở gốc dự án)</label>
+            <input type="text" id="spcnclExcelFile" placeholder="../excel/SPCNCL_TrungTam4_2026-09-11.xlsx">
+            <div style="font-size:11.5px;color:var(--muted);margin-top:4px;">Lưu ý: phải bắt đầu bằng <code>../excel/</code> (khác với KPI dùng <code>excel/</code>) vì trang này nằm trong thư mục con.</div>
           </div>
         </div>
         <div id="spcnclItemsContainer" style="margin-top:16px;"></div>
@@ -546,7 +547,12 @@ document.getElementById('spcnclSaveBtn').addEventListener('click', async () => {
   const msgEl = document.getElementById('spcnclMsg');
   msgEl.innerHTML = '';
   const updateDate = document.getElementById('spcnclDate').value;
-  const excelFile = document.getElementById('spcnclExcelFile').value.trim();
+  let excelFile = document.getElementById('spcnclExcelFile').value.trim();
+  // Tự chuẩn hóa: file excel dùng chung nằm ở gốc dự án, còn trang này nằm trong
+  // thư mục con spcncl_dashboard/, nên đường dẫn phải có tiền tố "../".
+  if (excelFile && !excelFile.startsWith('../') && !/^https?:\/\//i.test(excelFile)) {
+    excelFile = '../' + excelFile.replace(/^\.?\//, '');
+  }
 
   if (!updateDate) { msgEl.innerHTML = '<div class="msg msg-error">Vui lòng chọn ngày cập nhật.</div>'; return; }
 

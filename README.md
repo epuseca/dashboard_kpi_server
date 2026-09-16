@@ -34,7 +34,9 @@ cp .env.local.example .env.local
 node -r dotenv/config scripts/seed.js dotenv_config_path=.env.local
 ```
 
-Script này tạo unique index trên trường `updateDate` (tránh trùng ngày cập nhật) và nạp sẵn dữ liệu kỳ 11/09/2026 mà bạn đã có, để 2 dashboard có dữ liệu ngay sau khi deploy. Chạy 1 lần là đủ — chạy lại cũng an toàn (không tạo trùng).
+Script này tạo unique index trên trường `updateDate` (tránh trùng ngày cập nhật) và **import trực tiếp** dữ liệu từ 2 file `seed-data/kpi-data.js` và `seed-data/spcncl-data.js` (giữ nguyên cấu trúc `data.js` gốc bạn đang dùng) vào MongoDB, để 2 dashboard có dữ liệu ngay sau khi deploy. Chạy 1 lần là đủ — chạy lại cũng an toàn (không tạo trùng, kỳ đã có sẽ được cập nhật đè bằng dữ liệu mới nhất trong 2 file đó).
+
+**Muốn import thêm dữ liệu các kỳ cũ khác bạn đang có sẵn trong `data.js`:** mở `seed-data/kpi-data.js` / `seed-data/spcncl-data.js`, thêm các object kỳ cập nhật (copy nguyên cấu trúc, đổi `updateDate` + số liệu), rồi chạy lại đúng lệnh `node -r dotenv/config scripts/seed.js dotenv_config_path=.env.local` — không cần deploy lại code, chỉ cần chạy script này từ máy có `.env.local` trỏ đúng MongoDB.
 
 ---
 
@@ -89,7 +91,10 @@ vercel --prod # deploy bản chính thức
 ├── lib/
 │   ├── mongodb.js                Kết nối MongoDB (cache cho serverless)
 │   └── session.js                Cookie phiên đăng nhập admin (HMAC, không cần thư viện ngoài)
-├── scripts/seed.js                Script seed dữ liệu ban đầu + tạo index
+├── scripts/seed.js                Script import dữ liệu ban đầu (đọc từ seed-data/) + tạo index
+├── seed-data/
+│   ├── kpi-data.js                Dữ liệu KPI gốc để import (giữ cấu trúc data.js cũ)
+│   └── spcncl-data.js             Dữ liệu SPCNCL gốc để import (giữ cấu trúc data.js cũ)
 ├── excel/                        Nơi để file .xlsx gốc (tùy chọn)
 ├── package.json
 ├── .env.local.example
