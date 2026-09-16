@@ -496,6 +496,13 @@
       return 'bad';
     }
 
+    function statusToBarClass(status) {
+      if (status === 'on_track' || status === 'good') return 'good';
+      if (status === 'at_risk' || status === 'warn') return 'warn';
+      if (status === 'delayed' || status === 'bad') return 'bad';
+      return 'bad';
+    }
+
     const STATUS_LABEL = {
       on_track: 'Đúng tiến độ',
       at_risk: 'Có nguy cơ chậm',
@@ -555,7 +562,7 @@
       <div class="bar-track">
         <div class="bar-fill"
              data-month="${item.pctMonth}" data-approved="${item.pctApproved}"
-             data-cls-month="${ratioClass(item.pctMonth)}" data-cls-approved="${ratioClass(item.pctApproved)}"></div>
+             data-cls-month="${statusToBarClass(clsMonth)}" data-cls-approved="${statusToBarClass(clsApproved)}"></div>
         <div class="bar-pct-inline" data-month-text="${item.pctMonth}%" data-approved-text="${item.pctApproved}%">${item.pctMonth}%</div>
       </div>
       <div class="status-cell" data-status-month="${clsMonth}" data-status-approved="${clsApproved}">
