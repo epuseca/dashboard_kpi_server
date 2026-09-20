@@ -8,11 +8,11 @@
   :root{
     --navy:#1c3d6e; --navy-deep:#122c52; --bg:#f2f4f8; --card:#fff;
     --border:#e2e6ee; --text:#1c2333; --muted:#6b7385;
-    --green:#1e8a5f; --amber:#b98900; --red:#b42318;
+    --green:#1e8a5f; --amber:#b98900; --red:#b42318; --info:#0b5fae; --info-bg:#eaf2ff;
   }
   *{box-sizing:border-box;}
   body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);}
-  .wrap{max-width:1000px;margin:0 auto;padding:28px 20px 60px;}
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 20px 60px;}
   h1{font-size:22px;margin:0 0 4px;}
   .sub{color:var(--muted);font-size:13px;margin-bottom:24px;}
   .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:20px;}
@@ -42,20 +42,32 @@
   table{width:100%;border-collapse:collapse;font-size:13px;}
   th,td{padding:9px 8px;border-bottom:1px solid var(--border);text-align:left;}
   th{color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;}
-  .item-row{border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#fbfcfe;}
-  .item-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
-  .item-head .badge{font-size:11px;font-weight:700;color:#fff;background:var(--navy);border-radius:6px;padding:2px 8px;}
-  .group-title{font-size:13.5px;font-weight:700;color:var(--navy);margin:20px 0 10px;padding-top:14px;border-top:1px dashed var(--border);}
-  .group-title:first-of-type{border-top:none;padding-top:0;}
   .hidden{display:none !important;}
   .msg{font-size:13px;padding:10px 12px;border-radius:8px;margin-bottom:14px;}
   .msg-error{background:#fdecea;color:var(--red);}
   .msg-ok{background:#e9f7ef;color:var(--green);}
+  .msg-info{background:var(--info-bg);color:var(--info);}
   .login-box{max-width:360px;margin:80px auto 0;}
-  .spcncl-row{border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;background:#fbfcfe;}
-  .icon-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;}
+  .icon-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;flex:none;}
   .icon-btn:hover{color:var(--red);}
   a.linkback{font-size:12.5px;color:var(--navy);text-decoration:none;font-weight:600;}
+
+  /* ---- KPI: mục lớn / KPI nhỏ ---- */
+  .kpi-group{border:1.5px solid var(--navy); border-radius:12px; padding:16px; margin-bottom:18px; background:#f7f9fd;}
+  .kpi-group-head{display:flex; gap:10px; align-items:center; margin-bottom:14px;}
+  .kpi-group-code{width:90px; flex:none; font-weight:700; text-align:center;}
+  .kpi-group-name{flex:1; font-weight:600;}
+  .kpi-group-items{display:flex; flex-direction:column; gap:10px;}
+  .kpi-item-row{border:1px solid var(--border); border-radius:10px; padding:12px 14px; background:#fff;}
+  .kpi-item-top{display:flex; gap:8px; align-items:center; margin-bottom:8px;}
+  .kpi-item-stt{width:58px; flex:none; text-align:center; font-weight:700;}
+  .kpi-item-name{flex:2;}
+  .kpi-item-type{flex:1; min-width:150px;}
+  .kpi-item-insert-below{margin-top:10px; text-align:center; border-top:1px dashed var(--border); padding-top:8px;}
+  .btn-inline-add{background:none; border:1px dashed var(--navy); color:var(--navy); border-radius:7px; padding:5px 12px; font-size:11.5px; font-weight:700; cursor:pointer;}
+  .btn-inline-add:hover{background:#eaeff9;}
+  .kpi-group-additem{margin-top:12px;}
+  #kpiAddGroupBtn{margin-top:4px;}
 </style>
 </head>
 <body>
@@ -101,7 +113,7 @@
           <button class="btn btn-primary btn-sm" id="kpiNewBtn">+ Thêm kỳ mới</button>
         </div>
         <table id="kpiTable">
-          <thead><tr><th>Ngày cập nhật</th><th>Tổng điểm</th><th>File Excel</th><th></th></tr></thead>
+          <thead><tr><th>Ngày cập nhật</th><th>Tổng điểm</th><th>Số mục lớn</th><th></th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
@@ -117,13 +129,13 @@
             <label>Tổng điểm KPI (VD: 95.01)</label>
             <input type="number" step="0.01" id="kpiTotalScore">
           </div>
-          <div>
-            <label>Tên file Excel (đặt sẵn trong thư mục /excel)</label>
-            <input type="text" id="kpiExcelFile" placeholder="excel/KPI_TrungTam4_2026-09-11.xlsx">
-          </div>
         </div>
-        <div id="kpiItemsContainer"></div>
-        <div style="margin-top:16px;display:flex;gap:10px;">
+
+        <label style="margin-top:22px;">Các mục lớn (viễn cảnh chiến lược) và KPI trong từng mục</label>
+        <div id="kpiGroupsContainer"></div>
+        <button class="btn btn-outline btn-sm" id="kpiAddGroupBtn">+ Thêm mục lớn</button>
+
+        <div style="margin-top:20px;display:flex;gap:10px;">
           <button class="btn btn-primary" id="kpiSaveBtn">Lưu kỳ cập nhật</button>
           <button class="btn btn-outline" id="kpiCancelBtn">Hủy</button>
         </div>
@@ -138,24 +150,16 @@
           <button class="btn btn-primary btn-sm" id="spcnclNewBtn">+ Thêm kỳ mới</button>
         </div>
         <table id="spcnclTable">
-          <thead><tr><th>Ngày cập nhật</th><th>Số nhiệm vụ</th><th>File Excel</th><th></th></tr></thead>
+          <thead><tr><th>Ngày cập nhật</th><th>Số nhiệm vụ</th><th></th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
 
       <div class="card hidden" id="spcnclEditorCard">
         <div id="spcnclMsg"></div>
-        <div class="row">
-          <div>
-            <label>Ngày cập nhật</label>
-            <input type="date" id="spcnclDate">
-          </div>
-          <div>
-            <label>Tên file Excel (đặt sẵn trong thư mục /excel ở gốc dự án)</label>
-            <input type="text" id="spcnclExcelFile" placeholder="../excel/SPCNCL_TrungTam4_2026-09-11.xlsx">
-            <div style="font-size:11.5px;color:var(--muted);margin-top:4px;">Lưu ý: phải bắt đầu bằng <code>../excel/</code> (khác với KPI dùng <code>excel/</code>) vì trang này nằm trong thư mục con.</div>
-          </div>
-        </div>
+        <label>Ngày cập nhật</label>
+        <input type="date" id="spcnclDate" style="max-width:220px;">
+
         <div id="spcnclItemsContainer" style="margin-top:16px;"></div>
         <button class="btn btn-outline btn-sm" id="spcnclAddRowBtn" style="margin-top:6px;">+ Thêm nhiệm vụ</button>
         <div style="margin-top:16px;display:flex;gap:10px;">
@@ -170,27 +174,20 @@
 
 <script>
 // =================================================================
-// Cấu hình mẫu 11 KPI cố định (theo đúng bảng KPI cấp 3 TCT giao)
+// Tiện ích chung
 // =================================================================
-const KPI_TEMPLATE = [
-  { code: 'I', name: 'Viễn cảnh tài chính', items: [
-    { id: 1, name: 'Lợi nhuận Tổng công ty' },
-    { id: 2, name: 'Thực hiện chi phí đúng kế hoạch' },
-    { id: 3, name: 'Doanh thu đơn vị thực hiện' },
-    { id: 4, name: 'KQ thực hiện doanh thu Quý TCT' },
-  ]},
-  { code: 'III', name: 'Viễn cảnh nội bộ', items: [
-    { id: 5, name: 'Giải ngân Quỹ PT Khoa học và Công nghệ' },
-    { id: 6, name: 'Số nhiệm vụ KHCN cấp Bộ được nghiệm thu' },
-    { id: 7, name: 'Tiến độ Thanh toán dự án' },
-    { id: 8, name: 'Số lượng quy trình được đưa lên workflow' },
-    { id: 9, name: 'Tiến độ sản xuất thiết bị' },
-  ]},
-  { code: 'IV', name: 'Viễn cảnh học hỏi phát triển', items: [
-    { id: 10, name: 'LĐ chất lượng cao lĩnh vực tăng trưởng mới' },
-    { id: 11, name: 'LĐ tinh gọn theo đề án tái cơ cấu' },
-  ]},
-];
+function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
+function formatDateVN(iso){
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+function escapeAttr(str){
+  return String(str == null ? '' : str).replace(/"/g, '&quot;');
+}
+function escapeHtml(str){
+  return String(str == null ? '' : str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
 
 let kpiRecords = [];
 let spcnclRecords = [];
@@ -261,7 +258,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 // =================================================================
 async function loadKpiList(){
   const res = await fetch('/api/kpi');
-  kpiRecords = await res.json();
+  kpiRecords = await res.json(); // API đã trả về sắp xếp mới nhất trước
   const tbody = document.querySelector('#kpiTable tbody');
   tbody.innerHTML = '';
   if (!kpiRecords.length) {
@@ -270,10 +267,11 @@ async function loadKpiList(){
   }
   kpiRecords.forEach(r => {
     const tr = document.createElement('tr');
+    const soMuc = (r.groups || []).length;
     tr.innerHTML = `
       <td>${formatDateVN(r.updateDate)}</td>
       <td>${r.totalScore != null ? r.totalScore + '%' : '—'}</td>
-      <td>${r.excelFile || '—'}</td>
+      <td>${soMuc}</td>
       <td style="text-align:right;white-space:nowrap;">
         <button class="btn btn-outline btn-sm" data-edit="${r.updateDate}">Sửa</button>
         <button class="btn btn-danger btn-sm" data-del="${r.updateDate}">Xóa</button>
@@ -284,11 +282,6 @@ async function loadKpiList(){
   tbody.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => deleteKpi(b.dataset.del)));
 }
 
-function formatDateVN(iso){
-  const [y,m,d] = iso.split('-');
-  return `${d}/${m}/${y}`;
-}
-
 async function deleteKpi(date){
   if (!confirm(`Xóa kỳ cập nhật KPI ngày ${formatDateVN(date)}?`)) return;
   const res = await fetch('/api/kpi?date=' + encodeURIComponent(date), { method: 'DELETE' });
@@ -297,7 +290,122 @@ async function deleteKpi(date){
 }
 
 // =================================================================
-// KPI — form sửa/thêm
+// KPI — xây dựng mục lớn / KPI nhỏ (DOM động, không dùng template cố định)
+// =================================================================
+function nextKpiStt(){
+  return document.querySelectorAll('#kpiGroupsContainer .kpi-item-stt').length + 1;
+}
+
+function createKpiItemRow(item, defaultStt){
+  const isNumber = !!(item && item.valueNumber);
+  const stt = (item && item.id != null) ? item.id : defaultStt;
+  const row = document.createElement('div');
+  row.className = 'kpi-item-row';
+  row.innerHTML = `
+    <div class="kpi-item-top">
+      <input type="number" class="kpi-item-stt" value="${stt}" title="Số thứ tự KPI">
+      <input type="text" class="kpi-item-name" placeholder="Tên KPI" value="${escapeAttr(item ? item.name : '')}">
+      <select class="kpi-item-type">
+        <option value="text" ${!isNumber ? 'selected' : ''}>Nội dung (chữ)</option>
+        <option value="number" ${isNumber ? 'selected' : ''}>Định lượng (số)</option>
+      </select>
+      <button type="button" class="icon-btn kpi-item-remove" title="Xóa KPI này">Xóa ✕</button>
+    </div>
+    <div class="kpi-number-fields row" style="${isNumber ? '' : 'display:none;'}">
+      <div><label>Thực hiện</label><input type="number" step="any" class="kpi-actual" value="${isNumber ? item.valueNumber.actual : ''}"></div>
+      <div><label>Chỉ tiêu</label><input type="number" step="any" class="kpi-target" value="${isNumber ? item.valueNumber.target : ''}"></div>
+      <div><label>Đơn vị</label><input type="text" class="kpi-unit" value="${isNumber ? escapeAttr(item.valueNumber.unit || '') : ''}" placeholder="tr, %, ..."></div>
+    </div>
+    <div class="kpi-text-fields" style="${isNumber ? 'display:none;' : ''}">
+      <div class="row">
+        <div style="flex:2;">
+          <label>Nội dung hiển thị</label>
+          <input type="text" class="kpi-value-text" value="${item && !isNumber ? escapeAttr(item.valueText || '') : ''}" placeholder="VD: Hoàn thành, Đạt 80%, Không giao chỉ tiêu...">
+        </div>
+        <div>
+          <label>Tỷ lệ % (để trống nếu có sẵn số % trong nội dung)</label>
+          <input type="number" class="kpi-ratio" value="${item && !isNumber && item.ratio != null ? item.ratio : ''}">
+        </div>
+      </div>
+    </div>
+    <div class="kpi-item-insert-below">
+      <button type="button" class="btn-inline-add kpi-item-insert">+ Thêm KPI ngay dưới</button>
+    </div>
+  `;
+
+  row.querySelector('.kpi-item-type').addEventListener('change', (e) => {
+    const showNumber = e.target.value === 'number';
+    row.querySelector('.kpi-number-fields').style.display = showNumber ? '' : 'none';
+    row.querySelector('.kpi-text-fields').style.display = showNumber ? 'none' : '';
+  });
+
+  row.querySelector('.kpi-item-remove').addEventListener('click', () => {
+    row.remove();
+  });
+
+  row.querySelector('.kpi-item-insert').addEventListener('click', () => {
+    const newRow = createKpiItemRow(null, nextKpiStt());
+    row.after(newRow);
+  });
+
+  return row;
+}
+
+function createKpiGroup(group){
+  const g = document.createElement('div');
+  g.className = 'kpi-group';
+  g.innerHTML = `
+    <div class="kpi-group-head">
+      <input type="text" class="kpi-group-code" placeholder="Mã (VD: I)" value="${escapeAttr(group ? group.code : '')}">
+      <input type="text" class="kpi-group-name" placeholder="Tên viễn cảnh / mục lớn" value="${escapeAttr(group ? group.name : '')}">
+      <button type="button" class="btn btn-danger btn-sm kpi-group-remove">Xóa mục lớn</button>
+    </div>
+    <div class="kpi-group-items"></div>
+    <button type="button" class="btn btn-outline btn-sm kpi-group-additem">+ Thêm KPI trong mục này</button>
+  `;
+
+  g.querySelector('.kpi-group-remove').addEventListener('click', () => {
+    if (!confirm('Xóa mục lớn này (và toàn bộ KPI bên trong)?')) return;
+    g.remove();
+  });
+
+  const itemsContainer = g.querySelector('.kpi-group-items');
+  g.querySelector('.kpi-group-additem').addEventListener('click', () => {
+    itemsContainer.appendChild(createKpiItemRow(null, nextKpiStt()));
+  });
+
+  // Trả về kèm danh sách item cần populate SAU KHI group đã được gắn vào DOM
+  // (để nextKpiStt() đếm đúng số KPI đã có trong toàn bộ form).
+  g._pendingItems = (group && group.items && group.items.length) ? group.items : [null];
+  return g;
+}
+
+function renderKpiGroups(groups){
+  const container = document.getElementById('kpiGroupsContainer');
+  container.innerHTML = '';
+  const list = (groups && groups.length) ? groups : [null];
+  list.forEach(gr => {
+    const g = createKpiGroup(gr);
+    container.appendChild(g);
+    const itemsContainer = g.querySelector('.kpi-group-items');
+    g._pendingItems.forEach(it => {
+      itemsContainer.appendChild(createKpiItemRow(it, nextKpiStt()));
+    });
+    delete g._pendingItems;
+  });
+}
+
+document.getElementById('kpiAddGroupBtn').addEventListener('click', () => {
+  const container = document.getElementById('kpiGroupsContainer');
+  const g = createKpiGroup(null);
+  container.appendChild(g);
+  const itemsContainer = g.querySelector('.kpi-group-items');
+  itemsContainer.appendChild(createKpiItemRow(null, nextKpiStt()));
+  delete g._pendingItems;
+});
+
+// =================================================================
+// KPI — mở form thêm/sửa (thêm mới sẽ lấy kỳ gần nhất làm mẫu)
 // =================================================================
 document.getElementById('kpiNewBtn').addEventListener('click', () => openKpiEditor(null));
 document.getElementById('kpiCancelBtn').addEventListener('click', () => {
@@ -306,124 +414,84 @@ document.getElementById('kpiCancelBtn').addEventListener('click', () => {
 
 function openKpiEditor(date){
   const record = date ? kpiRecords.find(r => r.updateDate === date) : null;
-  document.getElementById('kpiMsg').innerHTML = '';
+  const msgEl = document.getElementById('kpiMsg');
+  msgEl.innerHTML = '';
+
   document.getElementById('kpiDate').value = record ? record.updateDate : '';
-  document.getElementById('kpiDate').disabled = false;
-  document.getElementById('kpiTotalScore').value = record ? record.totalScore : '';
-  document.getElementById('kpiExcelFile').value = record ? (record.excelFile || '') : '';
+  document.getElementById('kpiTotalScore').value = record ? (record.totalScore != null ? record.totalScore : '') : '';
 
-  const container = document.getElementById('kpiItemsContainer');
-  container.innerHTML = '';
+  let groupsToRender = null;
+  if (record) {
+    groupsToRender = record.groups;
+  } else if (kpiRecords.length) {
+    const latest = kpiRecords[0]; // đã sắp xếp mới nhất trước
+    groupsToRender = deepClone(latest.groups);
+    msgEl.innerHTML = `<div class="msg msg-info">Đã lấy dữ liệu kỳ gần nhất (${formatDateVN(latest.updateDate)}) làm mẫu — chỉnh sửa số liệu bên dưới rồi lưu thành kỳ mới (đừng quên đổi Ngày cập nhật).</div>`;
+  }
 
-  KPI_TEMPLATE.forEach(group => {
-    const h = document.createElement('div');
-    h.className = 'group-title';
-    h.textContent = `Viễn cảnh ${group.code} — ${group.name}`;
-    container.appendChild(h);
-
-    group.items.forEach(tpl => {
-      const existing = record ? findItemInGroups(record.groups, tpl.id) : null;
-      const isNumber = existing && existing.valueNumber;
-      const div = document.createElement('div');
-      div.className = 'item-row';
-      div.dataset.id = tpl.id;
-      div.dataset.code = group.code;
-      div.dataset.groupName = group.name;
-      div.innerHTML = `
-        <div class="item-head">
-          <span class="badge">KPI ${tpl.id}</span>
-          <select class="kpi-item-type">
-            <option value="text" ${!isNumber ? 'selected' : ''}>Nội dung (chữ)</option>
-            <option value="number" ${isNumber ? 'selected' : ''}>Số liệu định lượng</option>
-          </select>
-        </div>
-        <label>Tên KPI</label>
-        <input type="text" class="kpi-item-name" value="${escapeAttr(existing ? existing.name : tpl.name)}">
-        <div class="kpi-number-fields row" style="${isNumber ? '' : 'display:none;'}">
-          <div><label>Thực hiện</label><input type="number" step="any" class="kpi-actual" value="${isNumber ? existing.valueNumber.actual : ''}"></div>
-          <div><label>Chỉ tiêu</label><input type="number" step="any" class="kpi-target" value="${isNumber ? existing.valueNumber.target : ''}"></div>
-          <div><label>Đơn vị</label><input type="text" class="kpi-unit" value="${isNumber ? escapeAttr(existing.valueNumber.unit || '') : ''}" placeholder="tr, %, ..."></div>
-        </div>
-        <div class="kpi-text-fields" style="${isNumber ? 'display:none;' : ''}">
-          <label>Nội dung hiển thị</label>
-          <input type="text" class="kpi-value-text" value="${existing && !isNumber ? escapeAttr(existing.valueText || '') : ''}" placeholder="VD: Hoàn thành, Đạt 80%, Không giao chỉ tiêu...">
-          <label>Tỷ lệ hoàn thành % (để trống nếu đã có sẵn số % trong nội dung ở trên)</label>
-          <input type="number" class="kpi-ratio" value="${existing && !isNumber && existing.ratio != null ? existing.ratio : ''}">
-        </div>
-      `;
-      container.appendChild(div);
-
-      const select = div.querySelector('.kpi-item-type');
-      select.addEventListener('change', () => {
-        const showNumber = select.value === 'number';
-        div.querySelector('.kpi-number-fields').style.display = showNumber ? '' : 'none';
-        div.querySelector('.kpi-text-fields').style.display = showNumber ? 'none' : '';
-      });
-    });
-  });
+  renderKpiGroups(groupsToRender);
 
   document.getElementById('kpiEditorCard').classList.remove('hidden');
   document.getElementById('kpiEditorCard').scrollIntoView({ behavior: 'smooth' });
 }
 
-function findItemInGroups(groups, id){
-  for (const g of groups) {
-    const found = g.items.find(it => it.id === id);
-    if (found) return found;
-  }
-  return null;
-}
-
-function escapeAttr(str){
-  return String(str == null ? '' : str).replace(/"/g, '&quot;');
-}
-
+// =================================================================
+// KPI — lưu
+// =================================================================
 document.getElementById('kpiSaveBtn').addEventListener('click', async () => {
   const msgEl = document.getElementById('kpiMsg');
   msgEl.innerHTML = '';
   const updateDate = document.getElementById('kpiDate').value;
-  const totalScore = parseFloat(document.getElementById('kpiTotalScore').value);
-  const excelFile = document.getElementById('kpiExcelFile').value.trim();
+  const totalScoreRaw = document.getElementById('kpiTotalScore').value;
+  const totalScore = totalScoreRaw === '' ? null : parseFloat(totalScoreRaw);
 
   if (!updateDate) { msgEl.innerHTML = '<div class="msg msg-error">Vui lòng chọn ngày cập nhật.</div>'; return; }
 
-  const groupsMap = {};
-  KPI_TEMPLATE.forEach(g => { groupsMap[g.code] = { code: g.code, name: g.name, items: [] }; });
+  const groupEls = document.querySelectorAll('#kpiGroupsContainer .kpi-group');
+  if (!groupEls.length) { msgEl.innerHTML = '<div class="msg msg-error">Cần ít nhất 1 mục lớn.</div>'; return; }
 
   let hasError = false;
-  document.querySelectorAll('#kpiItemsContainer .item-row').forEach(div => {
-    const id = Number(div.dataset.id);
-    const code = div.dataset.code;
-    const name = div.querySelector('.kpi-item-name').value.trim();
-    const type = div.querySelector('.kpi-item-type').value;
-    const item = { id, name };
+  const groups = Array.from(groupEls).map(g => {
+    const code = g.querySelector('.kpi-group-code').value.trim();
+    const name = g.querySelector('.kpi-group-name').value.trim();
+    if (!name) hasError = true;
 
-    if (type === 'number') {
-      const actual = parseFloat(div.querySelector('.kpi-actual').value);
-      const target = parseFloat(div.querySelector('.kpi-target').value);
-      const unit = div.querySelector('.kpi-unit').value.trim();
-      if (isNaN(actual) || isNaN(target)) { hasError = true; }
-      item.valueNumber = { actual, target, unit };
-    } else {
-      const valueText = div.querySelector('.kpi-value-text').value.trim();
-      const ratioRaw = div.querySelector('.kpi-ratio').value;
-      item.valueText = valueText;
-      if (ratioRaw !== '') item.ratio = Number(ratioRaw);
-    }
-    groupsMap[code].items.push(item);
+    const itemEls = g.querySelectorAll('.kpi-item-row');
+    if (!itemEls.length) hasError = true;
+
+    const items = Array.from(itemEls).map(row => {
+      const id = Number(row.querySelector('.kpi-item-stt').value) || 0;
+      const iname = row.querySelector('.kpi-item-name').value.trim();
+      const type = row.querySelector('.kpi-item-type').value;
+      if (!iname) hasError = true;
+      const item = { id, name: iname };
+      if (type === 'number') {
+        const actual = parseFloat(row.querySelector('.kpi-actual').value);
+        const target = parseFloat(row.querySelector('.kpi-target').value);
+        const unit = row.querySelector('.kpi-unit').value.trim();
+        if (isNaN(actual) || isNaN(target)) hasError = true;
+        item.valueNumber = { actual, target, unit };
+      } else {
+        const valueText = row.querySelector('.kpi-value-text').value.trim();
+        const ratioRaw = row.querySelector('.kpi-ratio').value;
+        item.valueText = valueText;
+        if (ratioRaw !== '') item.ratio = Number(ratioRaw);
+      }
+      return item;
+    });
+
+    return { code, name, items };
   });
 
   if (hasError) {
-    msgEl.innerHTML = '<div class="msg msg-error">Có KPI định lượng đang thiếu số Thực hiện/Chỉ tiêu.</div>';
+    msgEl.innerHTML = '<div class="msg msg-error">Kiểm tra lại: mỗi mục lớn cần Tên + ít nhất 1 KPI; mỗi KPI cần Tên; KPI định lượng cần đủ Thực hiện/Chỉ tiêu.</div>';
     return;
   }
-
-  const groups = KPI_TEMPLATE.map(g => groupsMap[g.code]);
 
   const res = await fetch('/api/kpi', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ updateDate, excelFile, totalScore, groups }),
+    body: JSON.stringify({ updateDate, totalScore, groups }),
   });
   const data = await res.json();
   if (!res.ok) {
@@ -440,11 +508,11 @@ document.getElementById('kpiSaveBtn').addEventListener('click', async () => {
 // =================================================================
 async function loadSpcnclList(){
   const res = await fetch('/api/spcncl');
-  spcnclRecords = await res.json();
+  spcnclRecords = await res.json(); // API đã trả về sắp xếp mới nhất trước
   const tbody = document.querySelector('#spcnclTable tbody');
   tbody.innerHTML = '';
   if (!spcnclRecords.length) {
-    tbody.innerHTML = '<tr><td colspan="4" style="color:var(--muted);">Chưa có dữ liệu.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="3" style="color:var(--muted);">Chưa có dữ liệu.</td></tr>';
     return;
   }
   spcnclRecords.forEach(r => {
@@ -452,7 +520,6 @@ async function loadSpcnclList(){
     tr.innerHTML = `
       <td>${formatDateVN(r.updateDate)}</td>
       <td>${r.items.length}</td>
-      <td>${r.excelFile || '—'}</td>
       <td style="text-align:right;white-space:nowrap;">
         <button class="btn btn-outline btn-sm" data-edit="${r.updateDate}">Sửa</button>
         <button class="btn btn-danger btn-sm" data-del="${r.updateDate}">Xóa</button>
@@ -471,7 +538,7 @@ async function deleteSpcncl(date){
 }
 
 // =================================================================
-// SPCNCL — form sửa/thêm
+// SPCNCL — form sửa/thêm (thêm mới sẽ lấy kỳ gần nhất làm mẫu)
 // =================================================================
 document.getElementById('spcnclNewBtn').addEventListener('click', () => openSpcnclEditor(null));
 document.getElementById('spcnclCancelBtn').addEventListener('click', () => {
@@ -481,14 +548,22 @@ document.getElementById('spcnclAddRowBtn').addEventListener('click', () => addSp
 
 function openSpcnclEditor(date){
   const record = date ? spcnclRecords.find(r => r.updateDate === date) : null;
-  document.getElementById('spcnclMsg').innerHTML = '';
+  const msgEl = document.getElementById('spcnclMsg');
+  msgEl.innerHTML = '';
   document.getElementById('spcnclDate').value = record ? record.updateDate : '';
-  document.getElementById('spcnclExcelFile').value = record ? (record.excelFile || '') : '';
 
   const container = document.getElementById('spcnclItemsContainer');
   container.innerHTML = '';
-  if (record) record.items.forEach(it => addSpcnclRow(it));
-  else addSpcnclRow(null);
+
+  if (record) {
+    record.items.forEach(it => addSpcnclRow(it));
+  } else if (spcnclRecords.length) {
+    const latest = spcnclRecords[0]; // đã sắp xếp mới nhất trước
+    deepClone(latest.items).forEach(it => addSpcnclRow(it));
+    msgEl.innerHTML = `<div class="msg msg-info">Đã lấy dữ liệu kỳ gần nhất (${formatDateVN(latest.updateDate)}) làm mẫu — chỉnh sửa lại cho phù hợp rồi lưu thành kỳ mới (đừng quên đổi Ngày cập nhật).</div>`;
+  } else {
+    addSpcnclRow(null);
+  }
 
   document.getElementById('spcnclEditorCard').classList.remove('hidden');
   document.getElementById('spcnclEditorCard').scrollIntoView({ behavior: 'smooth' });
@@ -502,14 +577,21 @@ const STATUS_OPTIONS = [
 
 function addSpcnclRow(item){
   const container = document.getElementById('spcnclItemsContainer');
+  const defaultStt = document.querySelectorAll('#spcnclItemsContainer .spcncl-row').length + 1;
+  const stt = (item && item.id != null) ? item.id : defaultStt;
+
   const div = document.createElement('div');
   div.className = 'spcncl-row';
+  div.style.cssText = 'border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;background:#fbfcfe;';
   const statusOptionsHtml = (selected) => STATUS_OPTIONS.map(o =>
     `<option value="${o.value}" ${o.value === selected ? 'selected' : ''}>${o.label}</option>`).join('');
 
   div.innerHTML = `
-    <div class="item-head">
-      <label style="margin:0;">Tên nhiệm vụ</label>
+    <div class="item-head" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:10px;">
+      <div style="display:flex;align-items:center;gap:10px;flex:1;">
+        <input type="number" class="sp-stt" value="${stt}" title="STT" style="width:64px;flex:none;font-weight:700;text-align:center;">
+        <label style="margin:0;">Tên nhiệm vụ</label>
+      </div>
       <button class="icon-btn" data-remove>Xóa nhiệm vụ ✕</button>
     </div>
     <input type="text" class="sp-name" value="${escapeAttr(item ? item.name : '')}" placeholder="VD: SPCNCL01">
@@ -538,21 +620,10 @@ function addSpcnclRow(item){
   div.querySelector('[data-remove]').addEventListener('click', () => div.remove());
 }
 
-function escapeHtml(str){
-  return String(str == null ? '' : str)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
 document.getElementById('spcnclSaveBtn').addEventListener('click', async () => {
   const msgEl = document.getElementById('spcnclMsg');
   msgEl.innerHTML = '';
   const updateDate = document.getElementById('spcnclDate').value;
-  let excelFile = document.getElementById('spcnclExcelFile').value.trim();
-  // Tự chuẩn hóa: file excel dùng chung nằm ở gốc dự án, còn trang này nằm trong
-  // thư mục con spcncl_dashboard/, nên đường dẫn phải có tiền tố "../".
-  if (excelFile && !excelFile.startsWith('../') && !/^https?:\/\//i.test(excelFile)) {
-    excelFile = '../' + excelFile.replace(/^\.?\//, '');
-  }
 
   if (!updateDate) { msgEl.innerHTML = '<div class="msg msg-error">Vui lòng chọn ngày cập nhật.</div>'; return; }
 
@@ -560,7 +631,7 @@ document.getElementById('spcnclSaveBtn').addEventListener('click', async () => {
   if (!rows.length) { msgEl.innerHTML = '<div class="msg msg-error">Cần ít nhất 1 nhiệm vụ.</div>'; return; }
 
   const items = Array.from(rows).map((div, idx) => ({
-    id: idx + 1,
+    id: Number(div.querySelector('.sp-stt').value) || (idx + 1),
     name: div.querySelector('.sp-name').value.trim(),
     pctMonth: Number(div.querySelector('.sp-pct-month').value) || 0,
     statusMonth: div.querySelector('.sp-status-month').value,
@@ -572,7 +643,7 @@ document.getElementById('spcnclSaveBtn').addEventListener('click', async () => {
   const res = await fetch('/api/spcncl', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ updateDate, excelFile, items }),
+    body: JSON.stringify({ updateDate, items }),
   });
   const data = await res.json();
   if (!res.ok) {

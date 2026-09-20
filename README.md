@@ -72,7 +72,12 @@ vercel --prod # deploy bản chính thức
 
 - Dashboard KPI: `https://<domain>/`
 - Dashboard SPCNCL: `https://<domain>/spcncl_dashboard/`
-- Trang quản trị: `https://<domain>/admin/` — đăng nhập bằng `ADMIN_PASSWORD`, chọn tab **KPI** hoặc **SPCNCL / SP Bộ giao**, bấm **+ Thêm kỳ mới** hoặc **Sửa** một kỳ có sẵn, điền số liệu rồi **Lưu kỳ cập nhật** — 2 dashboard sẽ hiển thị dữ liệu mới ngay lần tải trang kế tiếp (không cần deploy lại).
+- Trang quản trị: `https://<domain>/admin/` — đăng nhập bằng `ADMIN_PASSWORD`, chọn tab **KPI** hoặc **SPCNCL / SP Bộ giao**.
+  - **KPI:** mục lớn (viễn cảnh) và từng KPI nhỏ hoàn toàn linh động — dùng **+ Thêm mục lớn** / **Xóa mục lớn**, **+ Thêm KPI trong mục này** / **Xóa KPI này** / **+ Thêm KPI ngay dưới** (chèn đúng vị trí). Mỗi KPI có STT tự điền sẵn (sửa tay được), tên, và chọn **Nội dung (chữ)** hoặc **Định lượng (số)**.
+  - **SPCNCL:** mỗi nhiệm vụ cũng có STT tự điền sẵn, sửa tay được.
+  - Bấm **+ Thêm kỳ mới** ở cả 2 tab sẽ tự lấy dữ liệu kỳ gần nhất làm mẫu (có thông báo rõ ràng) — chỉ cần sửa số liệu rồi đổi ngày cập nhật, không phải gõ lại từ đầu.
+  - Không còn ô nhập file Excel trong trang quản trị (tính năng này đã được ẩn khỏi 2 dashboard).
+  - Bấm **Lưu kỳ cập nhật** — 2 dashboard sẽ hiển thị dữ liệu mới ngay lần tải trang kế tiếp (không cần deploy lại).
 - File Excel: nếu muốn nút "Tải dữ liệu (.xlsx)" tải thẳng 1 file có sẵn, upload file đó vào thư mục `excel/` (đặt tên đúng như bạn gõ ở ô "Tên file Excel" trong trang quản trị) rồi deploy lại. Nếu để trống, hệ thống tự sinh file Excel từ dữ liệu hiện có trên dashboard.
 
 ---
