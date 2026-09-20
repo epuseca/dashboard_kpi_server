@@ -59,10 +59,12 @@
   .kpi-group-name{flex:1; font-weight:600;}
   .kpi-group-items{display:flex; flex-direction:column; gap:10px;}
   .kpi-item-row{border:1px solid var(--border); border-radius:10px; padding:12px 14px; background:#fff;}
-  .kpi-item-top{display:flex; gap:8px; align-items:center; margin-bottom:8px;}
-  .kpi-item-stt{width:58px; flex:none; text-align:center; font-weight:700;}
-  .kpi-item-name{flex:2;}
-  .kpi-item-type{flex:1; min-width:150px;}
+  .kpi-item-top{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;}
+  .kpi-item-numname{display:flex; align-items:center; gap:8px; flex:1; min-width:240px;}
+  .kpi-item-stt{width:56px; flex:none; text-align:center; font-weight:700; background:#eef2fb;}
+  .kpi-item-name{flex:1; font-weight:600;}
+  .kpi-item-controls{display:flex; align-items:center; gap:8px; flex:none;}
+  .kpi-item-type{width:170px; flex:none;}
   .kpi-item-insert-below{margin-top:10px; text-align:center; border-top:1px dashed var(--border); padding-top:8px;}
   .btn-inline-add{background:none; border:1px dashed var(--navy); color:var(--navy); border-radius:7px; padding:5px 12px; font-size:11.5px; font-weight:700; cursor:pointer;}
   .btn-inline-add:hover{background:#eaeff9;}
@@ -303,13 +305,17 @@ function createKpiItemRow(item, defaultStt){
   row.className = 'kpi-item-row';
   row.innerHTML = `
     <div class="kpi-item-top">
-      <input type="number" class="kpi-item-stt" value="${stt}" title="Số thứ tự KPI">
-      <input type="text" class="kpi-item-name" placeholder="Tên KPI" value="${escapeAttr(item ? item.name : '')}">
-      <select class="kpi-item-type">
-        <option value="text" ${!isNumber ? 'selected' : ''}>Nội dung (chữ)</option>
-        <option value="number" ${isNumber ? 'selected' : ''}>Định lượng (số)</option>
-      </select>
-      <button type="button" class="icon-btn kpi-item-remove" title="Xóa KPI này">Xóa ✕</button>
+      <div class="kpi-item-numname">
+        <input type="number" class="kpi-item-stt" value="${stt}" title="Số thứ tự KPI">
+        <input type="text" class="kpi-item-name" placeholder="Tên KPI" value="${escapeAttr(item ? item.name : '')}">
+      </div>
+      <div class="kpi-item-controls">
+        <select class="kpi-item-type">
+          <option value="text" ${!isNumber ? 'selected' : ''}>Nội dung (chữ)</option>
+          <option value="number" ${isNumber ? 'selected' : ''}>Định lượng (số)</option>
+        </select>
+        <button type="button" class="icon-btn kpi-item-remove" title="Xóa KPI này">Xóa ✕</button>
+      </div>
     </div>
     <div class="kpi-number-fields row" style="${isNumber ? '' : 'display:none;'}">
       <div><label>Thực hiện</label><input type="number" step="any" class="kpi-actual" value="${isNumber ? item.valueNumber.actual : ''}"></div>
