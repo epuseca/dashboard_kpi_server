@@ -59,11 +59,11 @@
   .kpi-group-name{flex:1; font-weight:600;}
   .kpi-group-items{display:flex; flex-direction:column; gap:10px;}
   .kpi-item-row{border:1px solid var(--border); border-radius:10px; padding:12px 14px; background:#fff;}
-  .kpi-item-top{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;}
-  .kpi-item-numname{display:flex; align-items:center; gap:8px; flex:1; min-width:240px;}
+  .kpi-item-top{display:flex; justify-content:space-between; align-items:flex-end; gap:10px; margin-bottom:8px; flex-wrap:wrap;}
+  .kpi-item-numname{display:flex; align-items:flex-end; gap:8px; flex:1; min-width:260px;}
   .kpi-item-stt{width:56px; flex:none; text-align:center; font-weight:700; background:#eef2fb;}
-  .kpi-item-name{flex:1; font-weight:600;}
-  .kpi-item-controls{display:flex; align-items:center; gap:8px; flex:none;}
+  .kpi-item-name{width:100%; font-weight:600;}
+  .kpi-item-controls{display:flex; align-items:flex-end; gap:8px; flex:none;}
   .kpi-item-type{width:170px; flex:none;}
   .kpi-item-insert-below{margin-top:10px; text-align:center; border-top:1px dashed var(--border); padding-top:8px;}
   .btn-inline-add{background:none; border:1px dashed var(--navy); color:var(--navy); border-radius:7px; padding:5px 12px; font-size:11.5px; font-weight:700; cursor:pointer;}
@@ -306,15 +306,24 @@ function createKpiItemRow(item, defaultStt){
   row.innerHTML = `
     <div class="kpi-item-top">
       <div class="kpi-item-numname">
-        <input type="number" class="kpi-item-stt" value="${stt}" title="Số thứ tự KPI">
-        <input type="text" class="kpi-item-name" placeholder="Tên KPI" value="${escapeAttr(item ? item.name : '')}">
+        <div>
+          <label style="margin:0 0 3px;">STT</label>
+          <input type="number" class="kpi-item-stt" value="${stt}" title="Số thứ tự KPI">
+        </div>
+        <div style="flex:1;">
+          <label style="margin:0 0 3px;">Tên KPI</label>
+          <input type="text" class="kpi-item-name" placeholder="VD: Lợi nhuận Tổng công ty" value="${escapeAttr(item ? item.name : '')}">
+        </div>
       </div>
       <div class="kpi-item-controls">
-        <select class="kpi-item-type">
-          <option value="text" ${!isNumber ? 'selected' : ''}>Nội dung (chữ)</option>
-          <option value="number" ${isNumber ? 'selected' : ''}>Định lượng (số)</option>
-        </select>
-        <button type="button" class="icon-btn kpi-item-remove" title="Xóa KPI này">Xóa ✕</button>
+        <div>
+          <label style="margin:0 0 3px;">Loại</label>
+          <select class="kpi-item-type">
+            <option value="text" ${!isNumber ? 'selected' : ''}>Nội dung (chữ)</option>
+            <option value="number" ${isNumber ? 'selected' : ''}>Định lượng (số)</option>
+          </select>
+        </div>
+        <button type="button" class="icon-btn kpi-item-remove" title="Xóa KPI này" style="align-self:flex-end;margin-bottom:9px;">Xóa ✕</button>
       </div>
     </div>
     <div class="kpi-number-fields row" style="${isNumber ? '' : 'display:none;'}">
@@ -413,7 +422,10 @@ document.getElementById('kpiAddGroupBtn').addEventListener('click', () => {
 // =================================================================
 // KPI — mở form thêm/sửa (thêm mới sẽ lấy kỳ gần nhất làm mẫu)
 // =================================================================
-document.getElementById('kpiNewBtn').addEventListener('click', () => openKpiEditor(null));
+document.getElementById('kpiNewBtn').addEventListener('click', async () => {
+  await loadKpiList(); // luôn nạp lại dữ liệu mới nhất từ server trước khi lấy làm mẫu
+  openKpiEditor(null);
+});
 document.getElementById('kpiCancelBtn').addEventListener('click', () => {
   document.getElementById('kpiEditorCard').classList.add('hidden');
 });
@@ -546,7 +558,10 @@ async function deleteSpcncl(date){
 // =================================================================
 // SPCNCL — form sửa/thêm (thêm mới sẽ lấy kỳ gần nhất làm mẫu)
 // =================================================================
-document.getElementById('spcnclNewBtn').addEventListener('click', () => openSpcnclEditor(null));
+document.getElementById('spcnclNewBtn').addEventListener('click', async () => {
+  await loadSpcnclList(); // luôn nạp lại dữ liệu mới nhất từ server trước khi lấy làm mẫu
+  openSpcnclEditor(null);
+});
 document.getElementById('spcnclCancelBtn').addEventListener('click', () => {
   document.getElementById('spcnclEditorCard').classList.add('hidden');
 });
