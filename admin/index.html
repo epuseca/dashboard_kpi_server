@@ -54,7 +54,7 @@
 
   /* ---- KPI: mục lớn / KPI nhỏ ---- */
   .kpi-group{border:1.5px solid var(--navy); border-radius:12px; padding:16px; margin-bottom:18px; background:#f7f9fd;}
-  .kpi-group-head{display:flex; gap:10px; align-items:center; margin-bottom:14px;}
+  .kpi-group-head{display:flex; gap:10px; align-items:flex-end; margin-bottom:14px; flex-wrap:wrap;}
   .kpi-group-code{width:90px; flex:none; font-weight:700; text-align:center;}
   .kpi-group-name{flex:1; font-weight:600;}
   .kpi-group-items{display:flex; flex-direction:column; gap:10px;}
@@ -371,9 +371,15 @@ function createKpiGroup(group){
   g.className = 'kpi-group';
   g.innerHTML = `
     <div class="kpi-group-head">
-      <input type="text" class="kpi-group-code" placeholder="Mã (VD: I)" value="${escapeAttr(group ? group.code : '')}">
-      <input type="text" class="kpi-group-name" placeholder="Tên viễn cảnh / mục lớn" value="${escapeAttr(group ? group.name : '')}">
-      <button type="button" class="btn btn-danger btn-sm kpi-group-remove">Xóa mục lớn</button>
+      <div>
+        <label style="margin:0 0 3px;">Mã nhóm</label>
+        <input type="text" class="kpi-group-code" placeholder="VD: I" value="${escapeAttr(group ? group.code : '')}">
+      </div>
+      <div style="flex:1;">
+        <label style="margin:0 0 3px;">Tên mục lớn (viễn cảnh chiến lược)</label>
+        <input type="text" class="kpi-group-name" placeholder="VD: Viễn cảnh tài chính" value="${escapeAttr(group ? group.name : '')}">
+      </div>
+      <button type="button" class="btn btn-danger btn-sm kpi-group-remove" style="align-self:flex-end;margin-bottom:1px;">Xóa mục lớn</button>
     </div>
     <div class="kpi-group-items"></div>
     <button type="button" class="btn btn-outline btn-sm kpi-group-additem">+ Thêm KPI trong mục này</button>
